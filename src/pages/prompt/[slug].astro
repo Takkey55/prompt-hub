@@ -35,9 +35,52 @@ const categoryColorMap: Record<string, string> = {
 };
 
 const catBadgeStyle = categoryColorMap[prompt.data.category] || 'text-slate-300 bg-slate-800 border-slate-700';
+
+// Canonical URL & Schema.org TechArticle JSON-LD
+const articleUrl = new URL(Astro.url.pathname, Astro.site);
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": prompt.data.title,
+  "description": prompt.data.description,
+  "datePublished": prompt.data.pubDate.toISOString(),
+  "dateModified": prompt.data.pubDate.toISOString(),
+  "inLanguage": "ja",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": articleUrl.toString(),
+  },
+  "author": {
+    "@type": "Organization",
+    "name": "PromptHub",
+    "url": "https://takkey55.github.io/prompt-hub/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "PromptHub",
+    "url": "https://takkey55.github.io/prompt-hub/"
+  },
+  "proficiencyLevel": "Intermediate",
+  "keywords": [prompt.data.category, prompt.data.targetModel, "AIプロンプト", "業務自動化"],
+  "about": {
+    "@type": "Thing",
+    "name": prompt.data.category
+  }
+};
 ---
 
-<Layout title={`${prompt.data.title} | PromptHub`} description={prompt.data.description}>
+<Layout
+  title={`${prompt.data.title} | PromptHub`}
+  description={prompt.data.description}
+  type="article"
+  publishedTime={prompt.data.pubDate}
+>
+  <!-- Schema.org JSON-LD output in head slot -->
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  </Fragment>
+
   <!-- Breadcrumbs -->
   <nav class="flex items-center gap-2 text-xs text-slate-400 mb-8 overflow-x-auto whitespace-nowrap">
     <a href={import.meta.env.BASE_URL} class="hover:text-white transition-colors">ホーム</a>

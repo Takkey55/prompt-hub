@@ -1,9 +1,15 @@
 import { defineConfig } from 'astro/config';
 import tailwind from '@astrojs/tailwind';
+import sitemap from '@astrojs/sitemap';
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://Takkey55.github.io',
+  site: 'https://takkey55.github.io',
   base: '/prompt-hub',
-  integrations: [tailwind()],
+  integrations: [
+    tailwind(),
+    sitemap({
+      filter: (page) => !page.includes('/404'),
+    }),
+  ],
 });
