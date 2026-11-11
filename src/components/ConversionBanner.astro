@@ -1,0 +1,61 @@
+---
+import { Zap, ArrowRight, ShieldCheck, Sparkles } from 'lucide-astro';
+
+interface Props {
+  noteUrl?: string;
+  category?: string;
+}
+
+const {
+  noteUrl = "https://note.com",
+  category = "AI業務自動化"
+} = Astro.props;
+---
+
+<div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900 via-brand-950 to-slate-900 border border-brand-500/30 p-6 md:p-8 shadow-2xl">
+  <!-- Decorative glow effects -->
+  <div class="pointer-events-none absolute -top-24 -right-24 w-60 h-60 rounded-full bg-brand-500/20 blur-3xl"></div>
+  <div class="pointer-events-none absolute -bottom-24 -left-24 w-60 h-60 rounded-full bg-indigo-500/20 blur-3xl"></div>
+
+  <div class="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+    <div class="flex-1 space-y-3">
+      <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-brand-500/20 text-brand-300 border border-brand-500/30">
+        <Sparkles class="w-3.5 h-3.5 text-brand-400" />
+        <span>実務特化・完全自動化パッケージ</span>
+      </div>
+
+      <h3 class="text-xl md:text-2xl font-bold text-white tracking-tight leading-snug">
+        このプロンプトを完全自動で実行する<br class="hidden sm:inline" />
+        <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-300 to-indigo-200">スクリプト＆業務シート完全版</span>はこちら
+      </h3>
+
+      <p class="text-sm text-slate-300 leading-relaxed max-w-2xl">
+        手作業のコピペすら不要に。スプレッドシート連携スクリプト、Claude Code用バッチ実行定義、実践チェックシートをセットにした限定キットを有料note/Brainにて特別公開中。
+      </p>
+
+      <div class="flex flex-wrap items-center gap-4 text-xs text-slate-400 pt-1">
+        <span class="flex items-center gap-1">
+          <ShieldCheck class="w-4 h-4 text-emerald-400" /> 買い切り型・追加費用なし
+        </span>
+        <span class="flex items-center gap-1">
+          <Zap class="w-4 h-4 text-amber-400" /> 動作確認済みコード付属
+        </span>
+        <span class="text-slate-300 font-medium">
+          通常価格 ¥9,800 → <span class="text-amber-300 font-bold text-sm">特別価格 ¥2,980〜</span>
+        </span>
+      </div>
+    </div>
+
+    <div class="w-full md:w-auto flex-shrink-0">
+      <a
+        href={noteUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="inline-flex w-full md:w-auto items-center justify-center gap-2 px-6 py-3.5 rounded-xl text-base font-bold text-slate-950 bg-gradient-to-r from-brand-300 via-brand-200 to-indigo-200 hover:from-white hover:to-brand-100 shadow-lg shadow-brand-500/25 transition-all duration-200 hover:scale-[1.02] active:scale-95 text-center group"
+      >
+        <span>完全版マニュアルを入手する</span>
+        <ArrowRight class="w-5 h-5 text-slate-900 group-hover:translate-x-1 transition-transform" />
+      </a>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,81 @@
+---
+import { Copy, Check } from 'lucide-astro';
+
+interface Props {
+  text: string;
+  buttonText?: string;
+  className?: string;
+}
+
+const { text, buttonText = "プロンプトをコピー", className = "" } = Astro.props;
+---
+
+<div class={`inline-block ${className}`} data-copy-wrapper>
+  <!-- JSON encoded text to preserve multiline cleanly -->
+  <script type="application/json" class="prompt-data" set:html={JSON.stringify(text)} />
+  <button
+    type="button"
+    class="copy-btn group relative inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg text-slate-100 bg-slate-800 hover:bg-slate-700 active:scale-95 border border-slate-700 transition-all duration-200 shadow-sm cursor-pointer select-none"
+    aria-label="プロンプトをクリップボードにコピー"
+  >
+    <span class="icon-copy flex items-center gap-1.5 transition-opacity duration-200">
+      <Copy class="w-4 h-4 text-brand-400 group-hover:text-brand-300" />
+      <span class="btn-label">{buttonText}</span>
+    </span>
+    <span class="icon-success hidden items-center gap-1.5 text-emerald-400">
+      <Check class="w-4 h-4 text-emerald-400" />
+      <span>コピー完了！</span>
+    </span>
+  </button>
+</div>
+
+<script>
+  function setupCopyButtons() {
+    const wrappers = document.querySelectorAll('[data-copy-wrapper]');
+    wrappers.forEach((wrapper) => {
+      // Avoid double attaching
+      if (wrapper.getAttribute('data-initialized') === 'true') return;
+      wrapper.setAttribute('data-initialized', 'true');
+
+      const btn = wrapper.querySelector('.copy-btn');
+      const dataScript = wrapper.querySelector('.prompt-data');
+      const iconCopy = wrapper.querySelector('.icon-copy');
+      const iconSuccess = wrapper.querySelector('.icon-success');
+
+      if (!btn || !dataScript || !iconCopy || !iconSuccess) return;
+
+      let promptText = '';
+      try {
+        promptText = JSON.parse(dataScript.textContent || '""');
+      } catch (e) {
+        promptText = dataScript.textContent || '';
+      }
+
+      btn.addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(promptText);
+
+          iconCopy.classList.add('hidden');
+          iconCopy.classList.remove('flex');
+          iconSuccess.classList.remove('hidden');
+          iconSuccess.classList.add('flex');
+          btn.classList.add('border-emerald-500/50', 'bg-emerald-950/40');
+
+          setTimeout(() => {
+            iconSuccess.classList.add('hidden');
+            iconSuccess.classList.remove('flex');
+            iconCopy.classList.remove('hidden');
+            iconCopy.classList.add('flex');
+            btn.classList.remove('border-emerald-500/50', 'bg-emerald-950/40');
+          }, 2000);
+        } catch (err) {
+          console.error('Failed to copy: ', err);
+        }
+      });
+    });
+  }
+
+  // Setup on initial load & after Astro view transitions
+  setupCopyButtons();
+  document.addEventListener('astro:page-load', setupCopyButtons);
+</script>
