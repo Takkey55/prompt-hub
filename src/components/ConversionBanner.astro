@@ -99,3 +99,24 @@ const {
     </div>
   </div>
 </div>
+
+<script>
+  function setupCtaTracking() {
+    const ctaLinks = document.querySelectorAll<HTMLAnchorElement>('[data-analytics="cta-note"]');
+    ctaLinks.forEach((link) => {
+      if (link.getAttribute('data-tracked') === 'true') return;
+      link.setAttribute('data-tracked', 'true');
+      link.addEventListener('click', () => {
+        if (typeof (window as any).gtag === 'function') {
+          (window as any).gtag('event', 'cta_note', {
+            event_category: 'engagement',
+            event_label: 'ConversionBanner note CTA',
+            destination_url: link.href,
+          });
+        }
+      });
+    });
+  }
+  setupCtaTracking();
+  document.addEventListener('astro:page-load', setupCtaTracking);
+</script>

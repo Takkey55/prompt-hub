@@ -42,3 +42,12 @@ jobs:
             git commit -m "chore(content): auto-generate weekly 10 prompts"
             git push origin main
           fi
+
+      - name: Run Weekly SEO & Conversion Report
+        env:
+          REPORT_WEBHOOK_URL: ${{ secrets.REPORT_WEBHOOK_URL }}
+          GOOGLE_APPLICATION_CREDENTIALS_JSON: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_JSON }}
+          GA4_PROPERTY_ID: ${{ secrets.GA4_PROPERTY_ID }}
+          GSC_SITE_URL: "https://takkey55.github.io/prompt-hub/"
+        run: |
+          node scripts/weekly-seo-report.mjs
