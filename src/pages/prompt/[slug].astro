@@ -40,7 +40,7 @@ const catBadgeStyle = categoryColorMap[prompt.data.category] || 'text-slate-300 
 <Layout title={`${prompt.data.title} | PromptHub`} description={prompt.data.description}>
   <!-- Breadcrumbs -->
   <nav class="flex items-center gap-2 text-xs text-slate-400 mb-8 overflow-x-auto whitespace-nowrap">
-    <a href="/" class="hover:text-white transition-colors">ホーム</a>
+    <a href={import.meta.env.BASE_URL} class="hover:text-white transition-colors">ホーム</a>
     <ChevronRight class="w-3.5 h-3.5 text-slate-600 flex-shrink-0" />
     <span class="text-slate-300">{prompt.data.category}</span>
     <ChevronRight class="w-3.5 h-3.5 text-slate-600 flex-shrink-0" />
@@ -121,7 +121,7 @@ const catBadgeStyle = categoryColorMap[prompt.data.category] || 'text-slate-300 
   <!-- Bottom Back Navigation -->
   <div class="text-center">
     <a
-      href="/"
+      href={import.meta.env.BASE_URL}
       class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-sm font-semibold text-slate-300 hover:text-white transition-all hover:scale-105"
     >
       <span>← プロンプト一覧に戻る</span>

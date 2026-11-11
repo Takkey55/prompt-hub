@@ -116,7 +116,7 @@ const categoryColorMap: Record<string, string> = {
 
               <!-- Title -->
               <h2 class="text-base sm:text-lg font-bold text-white group-hover:text-brand-300 transition-colors line-clamp-2">
-                <a href={`/prompt/${item.slug}/`} class="focus:outline-none focus:underline">
+                <a href={`${import.meta.env.BASE_URL}/prompt/${item.slug}/`} class="focus:outline-none focus:underline">
                   {item.data.title}
                 </a>
               </h2>
@@ -140,7 +140,7 @@ const categoryColorMap: Record<string, string> = {
                   {formattedDate}
                 </span>
                 <a
-                  href={`/prompt/${item.slug}/`}
+                  href={`${import.meta.env.BASE_URL}/prompt/${item.slug}/`}
                   class="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-slate-800 group-hover:bg-brand-500 group-hover:text-white text-slate-300 transition-colors"
                   aria-label={`${item.data.title}の詳細を見る`}
                 >
