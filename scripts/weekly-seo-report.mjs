@@ -26,6 +26,8 @@ const endDateStr = formatDate(today);
 
 // Environment variables
 const WEBHOOK_URL = process.env.REPORT_WEBHOOK_URL || '';
+const LINE_CHANNEL_ACCESS_TOKEN = process.env.LINE_CHANNEL_ACCESS_TOKEN || '';
+const LINE_USER_ID = process.env.LINE_USER_ID || '';
 const SITE_URL = process.env.GSC_SITE_URL || 'https://takkey55.github.io/prompt-hub/';
 const GA4_PROPERTY_ID = process.env.GA4_PROPERTY_ID || '';
 const GOOGLE_CREDENTIALS_JSON = process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON || '';
@@ -139,39 +141,82 @@ async function sendNotification(summaryText) {
   console.log(summaryText);
   console.log('-------------------------------\n');
 
-  if (!WEBHOOK_URL) {
-    console.log('ℹ️ REPORT_WEBHOOK_URL が設定されていないため、Webhook送信をスキップしました。');
-    console.log('💡 GitHub Secretsに REPORT_WEBHOOK_URL を設定するとDiscord/Slack等に即時自動配信されます。');
-    return;
+  let sent = false;
+
+  // 1. LINE Messaging API による送信
+  if (LINE_CHANNEL_ACCESS_TOKEN) {
+    try {
+      console.log('📱 LINE Messaging API 経由で通知を送信中...');
+      // If user ID is specified, use push message; otherwise use broadcast
+      const endpoint = LINE_USER_ID
+        ? 'https://api.line.me/v2/bot/message/push'
+        : 'https://api.line.me/v2/bot/message/broadcast';
+
+      const bodyData = LINE_USER_ID
+        ? {
+            to: LINE_USER_ID,
+            messages: [{ type: 'text', text: summaryText }],
+          }
+        : {
+            messages: [{ type: 'text', text: summaryText }],
+          };
+
+      const lineRes = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${LINE_CHANNEL_ACCESS_TOKEN}`,
+        },
+        body: JSON.stringify(bodyData),
+      });
+
+      if (lineRes.ok) {
+        console.log('✅ LINEへの通知を正常に送信しました！');
+        sent = true;
+      } else {
+        const errorText = await lineRes.text();
+        console.error(`❌ LINE送信エラー: HTTP ${lineRes.status}`, errorText);
+      }
+    } catch (lineErr) {
+      console.error('❌ LINE送信失敗:', lineErr.message);
+    }
   }
 
-  try {
-    // Discord & Slack compatible JSON payload
-    let payload = {};
-    if (WEBHOOK_URL.includes('slack.com')) {
-      payload = { text: summaryText };
-    } else {
-      // Discord or general webhooks
-      payload = {
-        content: summaryText,
-        username: 'PromptHub Metrics Bot',
-        avatar_url: 'https://takkey55.github.io/prompt-hub/favicon.svg',
-      };
-    }
+  // 2. 汎用 Webhook (Discord / Slack / LINE Notify等) による送信
+  if (WEBHOOK_URL) {
+    try {
+      let payload = {};
+      if (WEBHOOK_URL.includes('slack.com')) {
+        payload = { text: summaryText };
+      } else {
+        // Discord or general webhook
+        payload = {
+          content: summaryText,
+          username: 'PromptHub Metrics Bot',
+          avatar_url: 'https://takkey55.github.io/prompt-hub/favicon.svg',
+        };
+      }
 
-    const res = await fetch(WEBHOOK_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    });
+      const res = await fetch(WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
 
-    if (res.ok) {
-      console.log('✅ Webhook通知を正常に送信しました！');
-    } else {
-      console.error(`❌ Webhook送信エラー: HTTP ${res.status} ${res.statusText}`);
+      if (res.ok) {
+        console.log('✅ Webhook通知を正常に送信しました！');
+        sent = true;
+      } else {
+        console.error(`❌ Webhook送信エラー: HTTP ${res.status} ${res.statusText}`);
+      }
+    } catch (err) {
+      console.error('❌ Webhook送信失敗:', err.message);
     }
-  } catch (err) {
-    console.error('❌ Webhook送信失敗:', err.message);
+  }
+
+  if (!sent && !LINE_CHANNEL_ACCESS_TOKEN && !WEBHOOK_URL) {
+    console.log('ℹ️ LINE_CHANNEL_ACCESS_TOKEN または REPORT_WEBHOOK_URL が設定されていないため、外部送信をスキップしました。');
+    console.log('💡 GitHub Secretsに LINE_CHANNEL_ACCESS_TOKEN を設定するとLINEに即時自動配信されます。');
   }
 }
 
